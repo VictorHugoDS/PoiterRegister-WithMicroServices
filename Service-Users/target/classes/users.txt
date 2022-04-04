@@ -1,0 +1,27 @@
+[
+  {
+    "id": "624726bd8ab3d867e502016f",
+    "name": "Victor Hugo Duarte",
+    "cpf": "11111111111"
+  },
+  {
+    "id": "624726bdc751d6bb2ca0f2a0",
+    "name": "Joann Joyner",
+    "cpf": "40841750300"
+  },
+  {
+    "id": "624726bdf245a340083ae2b1",
+    "name": "Lara Kelley",
+    "cpf": "51472540646"
+  },
+  {
+    "id": "624726bdb1176446776ad443",
+    "name": "Corrine Sargent",
+    "cpf": "75757863099"
+  },
+  {
+    "id": "624726bd5f473eb7a16bab69",
+    "name": "Rae Foley",
+    "cpf": "00447819038"
+  }
+]
