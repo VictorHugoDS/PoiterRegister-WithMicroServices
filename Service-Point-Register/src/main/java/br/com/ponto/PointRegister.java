@@ -17,7 +17,6 @@ public class PointRegister implements Closeable {
 
     private final String tableName = "point_register";
     private Connection connection;
-    private Point point;
     private Calendar exactlyCreationTime;
 
     PointRegister()  {
@@ -53,20 +52,6 @@ public class PointRegister implements Closeable {
                 Map.of()
         );
         kafkaServiceExecute.run();
-
-        var kafkaDispatcher = new KafkaDispatcher<Point>("PONTO_POINT_REGISTERED",Map.of());
-        var point = pointerRegister.getPoint();
-        kafkaDispatcher.send(
-                point.getUser().getCpf(),
-                UUID.randomUUID().toString(),
-                point.getClass().getName(),
-                point
-        );
-
-    }
-
-    public Point getPoint() {
-        return point;
     }
 
     private String formatData (){
@@ -79,7 +64,7 @@ public class PointRegister implements Closeable {
         return date;
     }
 
-    public void insertNewUser(User user) throws SQLException {
+    public Point insertNewUser(User user) throws SQLException {
         var statement = connection.prepareStatement("Insert into "+tableName+" " +
                 "(id,userId,name,cpf,register,valid,status)" +
                 "values (?,?,?,?,?,?,?)");
@@ -91,19 +76,31 @@ public class PointRegister implements Closeable {
         statement.setString(6, Validation.PENDING.getValidationValue());
         statement.setString(7, PointStatus.PENDING.getPointStatus());
 
-        point = new Point(UUID.randomUUID().toString(), user, exactlyCreationTime);
+        var point = new Point(UUID.randomUUID().toString(), user, exactlyCreationTime,
+                Validation.PENDING, PointStatus.PENDING);
+        statement.execute();
+        System.out.println(point);
         System.out.println("A new Pointer Register was created!");
-
+        return point;
     }
 
-    private void parse(ConsumerRecord<String, Message<User>> record) throws IOException {
+    private void parse(ConsumerRecord<String, Message<User>> record) throws ExecutionException, InterruptedException {
         var user = record.value().getPayload();
         try {
-            insertNewUser(user);
+            var point = insertNewUser(user);
+            var kafkaDispatcher = new KafkaDispatcher<Point>("PONTO_POINT_REGISTERED",Map.of());
+
+            kafkaDispatcher.send(
+                    point.getUser().getCpf(),
+                    UUID.randomUUID().toString(),
+                    point.getClass().getName(),
+                    point
+            );
         } catch (SQLException e) {
             e.printStackTrace();
             throw new RuntimeException("Something went wrong when saving this user: " +user.getId());
         }
+
     }
 
     @Override

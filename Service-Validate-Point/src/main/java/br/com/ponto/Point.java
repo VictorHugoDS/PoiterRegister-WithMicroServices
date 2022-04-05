@@ -8,17 +8,11 @@ public class Point {
     private User user;
     private Calendar datePoint;
     private Validation validation;
-    private PointStatus status;
 
     public Point(String id, User user, Calendar datePoint) {
         this.id = id;
         this.user = user;
         this.datePoint = datePoint;
-    }
-    public Point(String id, User user, Calendar datePoint,Validation validation,PointStatus status) {
-        this(id, user, datePoint);
-        this.validation =validation;
-        this.status = status;
     }
 
     @Override
@@ -28,15 +22,18 @@ public class Point {
                 ", user=" + user +
                 ", datePoint=" + datePoint +
                 ", validation=" + validation +
-                ", status=" + status +
                 '}';
+    }
+
+    public Validation getValidation() {
+        return validation;
     }
 
     public User getUser() {
         return user;
     }
 
-    public Calendar getDatePoint() {
-        return datePoint;
+    public void setValidation(Validation validation) {
+        this.validation = validation;
     }
 }

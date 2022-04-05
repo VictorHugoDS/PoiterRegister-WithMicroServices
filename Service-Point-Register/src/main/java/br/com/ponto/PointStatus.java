@@ -12,4 +12,13 @@ public enum PointStatus {
     public String getPointStatus() {
         return pointStatus;
     }
+
+    public static PointStatus findEnumByValue(String value){
+        for(PointStatus v : values()){
+            if( v.pointStatus.equals(value)){
+                return v;
+            }
+        }
+        return null;
+    }
 }

@@ -24,7 +24,8 @@
         <module>New-User-Request</module>
         <module>CommonLibrary</module>
         <module>Service-Point-Register</module>
-        <module>Service-Validity-Detector</module>
+        <module>Service-Validate-Point</module>
+        <module>Service-User-Autentication</module>
     </modules>
 
     <properties>

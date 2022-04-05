@@ -5,10 +5,7 @@ import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.serialization.StringDeserializer;
 
 import java.time.Duration;
-import java.util.Collections;
-import java.util.Map;
-import java.util.Properties;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 
 public class KafkaServiceExecute<T> {
@@ -20,7 +17,7 @@ public class KafkaServiceExecute<T> {
     KafkaServiceExecute(String topic, ExecutableFunction<T> parse, String simpleName, Map<String, String> otherProperties) {
         this.topic = topic;
         this.parse = parse;
-        this.consumer = new KafkaConsumer<>(properties(simpleName, otherProperties));
+        this.consumer = new KafkaConsumer<>(properties(simpleName,otherProperties));
     }
 
 
@@ -49,7 +46,7 @@ public class KafkaServiceExecute<T> {
     }
 
 
-    private Properties properties(String simpleName,Map<String,String> otherProperties){
+    private Properties properties(String simpleName, Map<String, String> map){
         var properties = new Properties();
         properties.setProperty(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "127.0.0.1:9092");
         properties.setProperty(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
@@ -57,7 +54,8 @@ public class KafkaServiceExecute<T> {
         properties.setProperty(ConsumerConfig.GROUP_ID_CONFIG, simpleName);
         properties.setProperty(ConsumerConfig.CLIENT_ID_CONFIG, UUID.randomUUID().toString());
         properties.setProperty(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, "1");
-        properties.putAll(otherProperties);
+        properties.putAll(map);
+        System.out.println(map.toString());
         return properties;
     }
 }

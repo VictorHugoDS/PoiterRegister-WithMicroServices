@@ -28,7 +28,7 @@ public class ServiceUser {
     // Simulates a request from other microservice that returns all users from a dataBase
     private static List<User> returnUsers() throws IOException {
         var gson =  new Gson();
-        var reader = Files.newBufferedReader(Path.of("Service-Users/src/main/resources/users.txt"));
+        var reader = Files.newBufferedReader(Path.of("Service-User-Authentication/src/main/resources/users.txt"));
         Type UsersArray = new TypeToken<ArrayList<User>>(){}.getType();
         List<User> users =  gson.fromJson(reader, UsersArray);
         return users;

@@ -2,16 +2,15 @@ package br.com.ponto;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonDeserializer;
 import org.apache.kafka.common.serialization.Deserializer;
 
-import java.util.Map;
+import java.util.ArrayList;
 
-public class GsonDeserializer implements Deserializer {
+public class GsonAdvancedDeserializer implements Deserializer {
 
     public static final String ADVANCED_SERIALIZER = "br.com.ponto.advanced_serializer";
 
-    private final Gson gson = new GsonBuilder().registerTypeAdapter(Message.class, new MessageAdapter()).create();
+    private final Gson gson = new GsonBuilder().registerTypeAdapter(Message.class, new AdvancedMessageAdapter(ArrayList.class.getName())).create();
 
     @Override
     public Message deserialize(String s, byte[] bytes) {

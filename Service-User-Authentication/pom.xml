@@ -9,7 +9,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>Service-Validity-Detector</artifactId>
+    <artifactId>Service-User-Autentication</artifactId>
     <dependencies>
         <dependency>
             <groupId>org.example</groupId>
