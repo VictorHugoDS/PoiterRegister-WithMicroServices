@@ -7,10 +7,14 @@ public class Point {
     private String id;
     private User user;
     private Calendar datePoint;
-    public Point(String id, User user, Calendar datePoint) {
+    private Validation validation;
+
+    public Point(String id, User user, Calendar datePoint, Validation validation) {
         this.id = id;
         this.user = user;
         this.datePoint = datePoint;
+        this.validation = validation;
+
     }
 
     @Override
@@ -19,18 +23,25 @@ public class Point {
                 "id='" + id + '\'' +
                 ", user=" + user +
                 ", datePoint=" + datePoint +
+                ", validation=" + validation +
                 '}';
     }
 
-    public User getUser() {
-        return user;
-    }
 
     public String getId() {
         return id;
     }
 
-    public Calendar getDatePoint() {
-        return datePoint;
+
+    public void setValidation(Validation validation) {
+        this.validation = validation;
+    }
+
+    public Validation getValidation() {
+        return validation;
+    }
+
+    public User getUser() {
+        return user;
     }
 }

@@ -2,6 +2,7 @@ package br.com.ponto;
 
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.sql.*;
 import java.text.ParseException;
@@ -12,7 +13,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 
-public class ConcatenateAllPointsOfUser {
+public class ConcatenateAllPointsOfUser implements Closeable {
 
     private Connection connection;
 
@@ -68,11 +69,9 @@ public class ConcatenateAllPointsOfUser {
         var results = statement.executeQuery();
 
         var pointArray = new ArrayList<Point>();
-        System.out.println(results.next());
         while (results.next()){
 
             Point pointFromQuery = getPoint(results);
-            System.out.println(pointFromQuery.toString());
             pointArray.add(pointFromQuery);
 
         }
@@ -86,27 +85,37 @@ public class ConcatenateAllPointsOfUser {
         var userId = results.getString("userId");
         var name = results.getString("name");
         var cpf = results.getString("cpf");
-        var valid = results.getString("valid");
-        var status = results.getString("status");
         var register = sdf.parse(results.getString("register"));
         var user = new User(userId,name,cpf);
         Calendar cal = Calendar.getInstance();
         cal.setTime(register);
-        var pointFromQuery = new Point(id,user,cal,Validation.findEnumByValue(valid),PointStatus.findEnumByValue(status));
+        var pointFromQuery = new Point(id,user,cal);
         return pointFromQuery;
     }
 
     private void parse(ConsumerRecord<String, Message<Point>> record) throws SQLException, ParseException, ExecutionException, InterruptedException {
         var point = record.value().getPayload();
         var arrayPoint = getAllPointsRegisteredToday(point.getDatePoint(),point.getUser());
-        var dispacher = new KafkaDispatcher<ArrayList<Point>>(
+        var dispatcher = new KafkaDispatcher<ArrayList<Point>>(
                 "PONTO_ALL_POINTS_OF_USER",
                 Map.of()
         );
-        dispacher.send(point.getUser().getCpf(),
+
+        dispatcher.send(
+                point.getUser().getCpf(),
                 UUID.randomUUID().toString(),
-                ArrayList.class.getName(),
+                Point.class.getName(),
                 arrayPoint
                 );
+        System.out.println("Point list sent");
+    }
+
+    @Override
+    public void close() {
+        try {
+            connection.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 }

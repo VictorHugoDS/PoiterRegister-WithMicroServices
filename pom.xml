@@ -25,7 +25,8 @@
         <module>CommonLibrary</module>
         <module>Service-Point-Register</module>
         <module>Service-Validate-Point</module>
-        <module>Service-User-Autentication</module>
+        <module>Service-User-Authentication</module>
+        <module>Service-Recorder-Register</module>
     </modules>
 
     <properties>

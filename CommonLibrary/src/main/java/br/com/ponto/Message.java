@@ -19,4 +19,8 @@ public class Message<T> {
     public T getPayload() {
         return payload;
     }
+
+    public String getType() {
+        return type;
+    }
 }

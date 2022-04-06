@@ -9,8 +9,6 @@ import java.util.Map;
 
 public class GsonDeserializer implements Deserializer {
 
-    public static final String ADVANCED_SERIALIZER = "br.com.ponto.advanced_serializer";
-
     private final Gson gson = new GsonBuilder().registerTypeAdapter(Message.class, new MessageAdapter()).create();
 
     @Override
