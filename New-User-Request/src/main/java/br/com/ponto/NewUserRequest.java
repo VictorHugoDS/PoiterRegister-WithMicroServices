@@ -13,7 +13,7 @@ public class NewUserRequest {
         map.put("Victor Hugo Duarte","11111111111");
         map.put("Corrine Sargent","51472540646");
         map.put("Lara Kelley","51472540646");
-        map.put("Victor Hugo Duarte1","11111111111");
+     /*   map.put("Victor Hugo Duarte1","11111111111");
         map.put("Corrine Sargent1","51472540646");
         map.put("Lara Kelley1","51472540646");
         map.put("Victor Hugo Duarte2","11111111111");
@@ -52,7 +52,7 @@ public class NewUserRequest {
         map.put("Lara 5Ke8lley","51472540646");
         map.put("Vict5or Hugo Duarte","11111111111");
         map.put("Corrine Sa7rgent","51472540646");
-        map.put("Lara Ke8lley","51472540646");
+        map.put("Lara Ke8lley","51472540646");*/
 
 
 

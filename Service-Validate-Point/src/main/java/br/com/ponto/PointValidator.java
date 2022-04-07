@@ -3,10 +3,7 @@ package br.com.ponto;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
@@ -19,44 +16,61 @@ public class PointValidator {
         map.put(GsonAdvancedDeserializer.ADVANCED_SERIALIZER_UPPER_CLASS,ArrayList.class.getName());
         map.put(GsonAdvancedDeserializer.ADVANCED_SERIALIZER_SUB_CLASS, Point.class.getName());
         var kafkaService = new KafkaServiceExecute<>(
-                "PONTO_ALL_POINTS_OF_USER_WITH_VALIDATION",
+                "PONTO_ALL_POINTS_OF_USER",
                 pointValidator::parse,
                 PointValidator.class.getSimpleName(),
                 map
         );
-        System.out.println("constuctor =sdasdasdasd");
         kafkaService.run();
-
-
 
     }
 
     private void parse(ConsumerRecord<String, Message<ArrayList<Point>>> record) throws ExecutionException, InterruptedException {
 
         ArrayList<Point> pointList = record.value().getPayload();
-        int count = 0;
-        Point pointToValidate = pointList.stream().filter(p->p.getValidation()==Validation.PENDING)
-                .collect(Collectors.toList()).stream().findFirst().orElse(null);
-        pointList.stream().forEach(p->System.out.println(p.getValidation()));
-        System.out.println(pointToValidate);
+        System.out.println(pointList.toString());
+        var pointsToValidate = getPointsValidated(pointList);
 
-        for (var point: pointList ) {
+        for (var point: pointsToValidate) {
+            var request = new DatabaseRequest<>(
+                    TypesOfRequest.UPDATE,
+                    "PONTO_POINT_VALIDATION_COMPLETE",
+                    point,
+                    "valid");
+            var kafkaDispatcher = new KafkaDispatcher<DatabaseRequest<Point>>("PONTO_POINT_DATABASE_REQUEST",Map.of());
+            kafkaDispatcher.send(
+                    point.getUser().getCpf(),
+                    UUID.randomUUID().toString(),
+                    request.getClass().getName(),
+                    request
+            );
+        }
+
+    }
+
+    private List<Point> getPointsValidated(ArrayList<Point> pointList) {
+        int count = 0;
+
+        var pointsToValidate = pointList.stream().filter(p->p.getValidation()==Validation.PENDING)
+                .collect(Collectors.toList());
+        Date maxDate = pointsToValidate.stream().map(p->p.getDatePoint().getTime()).max(Date::compareTo).get();
+        for (var point: pointList) {
             if (point.getValidation() == Validation.VALID){
                 count += 1;
             }
         }
-        if(count <= 3){
-            pointToValidate.setValidation(Validation.VALID);
-        } else {
-            pointToValidate.setValidation(Validation.INVALID);
+        for (var point : pointsToValidate) {
+            if(!point.getDatePoint().getTime().equals(maxDate)){
+                point.setValidation(Validation.INVALID);
+            } else {
+                if(count <= 3){
+                    point.setValidation(Validation.VALID);
+                } else {
+                    point.setValidation(Validation.INVALID);
+                }
+            }
         }
 
-        var dispatcher = new KafkaDispatcher<>("PONTO_POINT_REGISTER",Map.of());
-        dispatcher.send(pointToValidate.getUser().getCpf(),
-                UUID.randomUUID().toString(),
-                Point.class.getName(),
-                pointToValidate
-                );
-        System.out.println("A point was processed and was marked as valid or invalid" + pointToValidate.toString());
+        return pointsToValidate;
     }
 }

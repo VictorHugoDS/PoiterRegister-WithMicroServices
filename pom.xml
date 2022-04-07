@@ -26,7 +26,10 @@
         <module>Service-Point-Register</module>
         <module>Service-Validate-Point</module>
         <module>Service-User-Authentication</module>
-        <module>Service-Recorder-Register</module>
+        <module>Service-Point-Database-Manager</module>
+        <module>Service-Connect-Register-Validator</module>
+        <module>Service-Connect-Authentication-to-Register</module>
+        <module>Service-Status-Validate</module>
     </modules>
 
     <properties>

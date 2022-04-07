@@ -44,7 +44,7 @@ public class ServiceUser {
         var user = findsUser(possibleUser);
         if( user != null){
             var kafkaDispatcher = new KafkaDispatcher<User>(
-                    "PONTO_NEW_POINT_REQUEST_JUST_APPEARED",
+                    "PONTO_INTERVAL_TIME_TO_ANALYSE",
                     Collections.emptyMap()
             );
             var id = UUID.randomUUID().toString();
