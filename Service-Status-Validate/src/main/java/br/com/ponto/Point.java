@@ -30,6 +30,7 @@ public class Point {
     public String toString() {
         return "Point{" +
                 "validation=" + validation +
+                ", pointStatus=" + pointStatus +
                 ", id='" + id + '\'' +
                 ", user=" + user +
                 ", datePoint=" + datePoint +

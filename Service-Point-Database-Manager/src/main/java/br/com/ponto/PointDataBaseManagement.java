@@ -1,5 +1,10 @@
 package br.com.ponto;
 
+import br.com.ponto.consumer.GsonAdvancedDeserializer;
+import br.com.ponto.consumer.KafkaServiceExecute;
+import br.com.ponto.databaseThings.DatabaseRequest;
+import br.com.ponto.messageThings.Message;
+import br.com.ponto.producer.KafkaDispatcher;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 
@@ -49,7 +54,7 @@ public class PointDataBaseManagement {
         var dataBaseManagement = new PointDataBaseManagement();
 
         Map<String,String> map = new HashMap<>();
-        map.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG,GsonAdvancedDeserializer.class.getName());
+        map.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, GsonAdvancedDeserializer.class.getName());
         map.put(GsonAdvancedDeserializer.ADVANCED_SERIALIZER_UPPER_CLASS, DatabaseRequest.class.getName());
         map.put(GsonAdvancedDeserializer.ADVANCED_SERIALIZER_SUB_CLASS, Point.class.getName());
 
@@ -68,7 +73,7 @@ public class PointDataBaseManagement {
         var point = request.getPayload();
         var topic = request.getTopicToSend();
         if(topic != null){
-            kafkaDispatcher = new KafkaDispatcher<>(topic,Map.of());
+            kafkaDispatcher = new KafkaDispatcher<>(topic,Map.of(),PointDataBaseManagement.class.getSimpleName());
         }
         switch (typeRequest){
             case INSERT -> insertPoint(point);
@@ -86,7 +91,7 @@ public class PointDataBaseManagement {
     private void selectAllBasedOnPoint(Point point,String topic) throws SQLException, ParseException, ExecutionException, InterruptedException {
         var newPoint = getAllPointsRegisteredTodayOfAUser(point.getDatePoint(),point.getUser());
         if(topic != null){
-            var dispatcher = new KafkaDispatcher<ArrayList<Point>>(topic,Map.of());
+            var dispatcher = new KafkaDispatcher<ArrayList<Point>>(topic,Map.of(),PointDataBaseManagement.class.getSimpleName());
             dispatcher.send(
                     point.getUser().getCpf(),
                     UUID.randomUUID().toString(),
@@ -206,10 +211,9 @@ public class PointDataBaseManagement {
 
     private void updateValidityOfPoint(Point point, String columnNome) throws SQLException, NoSuchMethodException {
         var statement = connection.prepareStatement(
-                "UPDATE "+tableName+" set ? = ? where id = ?");
-        statement.setString(1,columnNome);
-        statement.setString(2,point.getFunction(columnNome).get());
-        statement.setString(3,point.getId());
+                "UPDATE "+tableName+" set "+columnNome+" = ? where id = ?");
+        statement.setString(1,point.getFunction(columnNome).get());
+        statement.setString(2,point.getId());
 
         statement.execute();
     }

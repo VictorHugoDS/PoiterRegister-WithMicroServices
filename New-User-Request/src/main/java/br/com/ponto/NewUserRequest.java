@@ -1,5 +1,7 @@
 package br.com.ponto;
 
+import br.com.ponto.producer.KafkaDispatcher;
+
 import java.util.*;
 import java.util.concurrent.ExecutionException;
 
@@ -7,13 +9,13 @@ public class NewUserRequest {
 
     public static void main(String[] args) throws ExecutionException, InterruptedException {
 
-        var kafkaDispatcher = new KafkaDispatcher<UserRequest>("PONTO_NEW_REQUEST", Collections.emptyMap());
+        var kafkaDispatcher = new KafkaDispatcher<UserRequest>("PONTO_NEW_REQUEST", Collections.emptyMap(),NewUserRequest.class.getSimpleName());
 
         var map = new HashMap<String,String>();
         map.put("Victor Hugo Duarte","11111111111");
         map.put("Corrine Sargent","51472540646");
         map.put("Lara Kelley","51472540646");
-     /*   map.put("Victor Hugo Duarte1","11111111111");
+        /*map.put("Victor Hugo Duarte1","11111111111");
         map.put("Corrine Sargent1","51472540646");
         map.put("Lara Kelley1","51472540646");
         map.put("Victor Hugo Duarte2","11111111111");

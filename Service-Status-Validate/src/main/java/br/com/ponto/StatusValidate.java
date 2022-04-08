@@ -1,5 +1,11 @@
 package br.com.ponto;
 
+import br.com.ponto.consumer.GsonAdvancedDeserializer;
+import br.com.ponto.consumer.KafkaServiceExecute;
+import br.com.ponto.databaseThings.DatabaseRequest;
+import br.com.ponto.databaseThings.TypesOfRequest;
+import br.com.ponto.messageThings.Message;
+import br.com.ponto.producer.KafkaDispatcher;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 
@@ -14,7 +20,7 @@ public class StatusValidate {
     public static void main(String[] args) {
         var validate = new StatusValidate();
         Map<String,String> map = new HashMap<>();
-        map.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG,GsonAdvancedDeserializer.class.getName());
+        map.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, GsonAdvancedDeserializer.class.getName());
         map.put(GsonAdvancedDeserializer.ADVANCED_SERIALIZER_UPPER_CLASS, ArrayList.class.getName());
         map.put(GsonAdvancedDeserializer.ADVANCED_SERIALIZER_SUB_CLASS, Point.class.getName());
         var kafkaServiceExecute = new KafkaServiceExecute<>(
@@ -27,8 +33,11 @@ public class StatusValidate {
     }
 
     private Point determineIfLateOrEarly(String hour, Point point) throws ParseException {
-        SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
-        Date data = sdf.parse(hour);
+        Calendar cal = Calendar.getInstance();
+        String date = new java.sql.Date(cal.getTime().getTime()).toString();
+        SimpleDateFormat sdf = new SimpleDateFormat("YYYY-MM-DD HH:mm:ss");
+        String dateHour = date +" "+ hour;
+        Date data = sdf.parse(dateHour);
 
         Calendar superiorLimit = Calendar.getInstance();
         superiorLimit.setTime(data);
@@ -51,9 +60,10 @@ public class StatusValidate {
     }
 
 
-    private Point validateStatusPoint(ArrayList<Point> points) throws ParseException {
+    private List<Point> validateStatusPoint(ArrayList<Point> points) throws ParseException {
         var validPoints = points.stream().filter(p->p.getValidation() == Validation.VALID).toList();
-        Date maxDate = validPoints.stream().map(p->p.getDatePoint().getTime()).max(Date::compareTo).get();
+        Date maxDate = points.stream().filter(p->p.getValidation() == Validation.PENDING).toList()
+                .stream().map(p->p.getDatePoint().getTime()).max(Date::compareTo).get();
         var pointsToValidate = points.stream().filter(p->p.getValidation() == Validation.PENDING).toList();
         for (var pointToValidate : pointsToValidate) {
             if(!pointToValidate.getDatePoint().getTime().equals(maxDate)){
@@ -61,7 +71,7 @@ public class StatusValidate {
             } else {
                 switch (validPoints.size()){
                     case 0:
-                        determineIfLateOrEarly("08:00:00", pointToValidate);
+                        determineIfLateOrEarly("07:00:00", pointToValidate);
                     case 1:
                         determineIfLateOrEarly("12:00:00", pointToValidate);
                     case 2:
@@ -70,10 +80,10 @@ public class StatusValidate {
                         determineIfLateOrEarly("17:00:00", pointToValidate);
                         break;
                     default:
-                        sendToDeadLetter(pointToValidate, validPoints);
+                        pointToValidate.setPointStatus(PointStatus.INVALID);
 
                 }
-                return pointToValidate;
+                return pointsToValidate;
             }
         }
         sendToDeadLetter(Objects.requireNonNull(pointsToValidate.stream().findFirst().orElse(null)), validPoints);
@@ -81,7 +91,7 @@ public class StatusValidate {
     }
 
     private void sendToDeadLetter(Point pointToValidate, List<Point> validPoints) {
-        var kafkaDispatcher = new KafkaDispatcher<List<Point>>("PONTO_DEAD_LETTER",Collections.emptyMap());
+        var kafkaDispatcher = new KafkaDispatcher<List<Point>>("PONTO_DEAD_LETTER",Collections.emptyMap(),StatusValidate.class.getSimpleName());
         var id =UUID.randomUUID().toString();
         try {
             kafkaDispatcher.send(pointToValidate.getId(),id,String.class.getName(), validPoints);
@@ -92,19 +102,23 @@ public class StatusValidate {
 
     private void parse(ConsumerRecord<String, Message<ArrayList<Point>>> record) throws ExecutionException, InterruptedException, ParseException {
         var point = record.value().getPayload();
-        var pointValidated = validateStatusPoint(point);
-        var request = new DatabaseRequest<>(
-                TypesOfRequest.UPDATE,
-                "PONTO_POINT_STATUS_COMPLETE",
-                pointValidated,
-                "status");
-        var kafkaDispatcher = new KafkaDispatcher<DatabaseRequest<Point>>("PONTO_POINT_DATABASE_REQUEST",Map.of());
-        kafkaDispatcher.send(
-                pointValidated.getUser().getCpf(),
-                UUID.randomUUID().toString(),
-                request.getClass().getName(),
-                request
-        );
+        var statedPoints = validateStatusPoint(point);
+        for (var statedPoint : statedPoints ) {
+            var request = new DatabaseRequest<>(
+                    TypesOfRequest.UPDATE,
+                    "PONTO_POINT_STATUS_COMPLETE",
+                    statedPoint,
+                    "status");
+            var kafkaDispatcher = new KafkaDispatcher<DatabaseRequest<Point>>("PONTO_POINT_DATABASE_REQUEST",Map.of(),StatusValidate.class.getSimpleName());
+            kafkaDispatcher.send(
+                    statedPoint.getUser().getCpf(),
+                    UUID.randomUUID().toString(),
+                    request.getClass().getName(),
+                    request
+            );
+
+        }
+
         System.out.println("A point was successful classified");
     }
 }

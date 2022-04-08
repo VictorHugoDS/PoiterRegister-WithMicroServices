@@ -1,17 +1,15 @@
 package br.com.ponto;
 
-import org.apache.kafka.clients.consumer.ConsumerConfig;
+import br.com.ponto.consumer.KafkaServiceExecute;
+import br.com.ponto.databaseThings.DatabaseRequest;
+import br.com.ponto.databaseThings.TypesOfRequest;
+import br.com.ponto.messageThings.Message;
+import br.com.ponto.producer.KafkaDispatcher;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 
-import java.io.Closeable;
-import java.sql.Connection;
-import java.sql.Date;
-import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
@@ -58,7 +56,7 @@ public class PointRegister {
                 TypesOfRequest.INSERT,
                 "PONTO_POINT_REGISTERED",
                 point);
-        var kafkaDispatcher = new KafkaDispatcher<DatabaseRequest<Point>>("PONTO_POINT_DATABASE_REQUEST",Map.of());
+        var kafkaDispatcher = new KafkaDispatcher<DatabaseRequest<Point>>("PONTO_POINT_DATABASE_REQUEST",Map.of(),PointRegister.class.getSimpleName());
         kafkaDispatcher.send(
                 point.getUser().getCpf(),
                 UUID.randomUUID().toString(),

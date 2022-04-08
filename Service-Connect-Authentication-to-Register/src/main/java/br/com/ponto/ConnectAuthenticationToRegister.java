@@ -1,5 +1,10 @@
 package br.com.ponto;
 
+import br.com.ponto.consumer.KafkaServiceExecute;
+import br.com.ponto.databaseThings.DatabaseRequest;
+import br.com.ponto.databaseThings.TypesOfRequest;
+import br.com.ponto.messageThings.Message;
+import br.com.ponto.producer.KafkaDispatcher;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 
 import java.sql.SQLException;
@@ -29,7 +34,7 @@ public class ConnectAuthenticationToRegister {
                 TypesOfRequest.SELECT,
                 "PONTO_NEW_POINT_REQUEST_JUST_APPEARED",
                 new Point(null,user,null));
-        var kafkaDispatcher = new KafkaDispatcher<DatabaseRequest<Point>>("PONTO_POINT_DATABASE_REQUEST",Map.of());
+        var kafkaDispatcher = new KafkaDispatcher<DatabaseRequest<Point>>("PONTO_POINT_DATABASE_REQUEST",Map.of(),ConnectAuthenticationToRegister.class.getSimpleName());
         kafkaDispatcher.send(
                 user.getCpf(),
                 UUID.randomUUID().toString(),

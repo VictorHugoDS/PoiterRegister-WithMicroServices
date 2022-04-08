@@ -1,6 +1,9 @@
 package br.com.ponto;
 
 
+import br.com.ponto.consumer.KafkaServiceExecute;
+import br.com.ponto.messageThings.Message;
+import br.com.ponto.producer.KafkaDispatcher;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
@@ -16,7 +19,7 @@ import java.util.concurrent.ExecutionException;
 public class ServiceUser {
 
     public static void main(String[] args) {
-        var kafkaService = new KafkaServiceExecute<UserRequest>(
+        var kafkaService = new KafkaServiceExecute<>(
                 "PONTO_NEW_REQUEST",
                 ServiceUser::parse,
                 ServiceUser.class.getSimpleName(),
@@ -45,7 +48,8 @@ public class ServiceUser {
         if( user != null){
             var kafkaDispatcher = new KafkaDispatcher<User>(
                     "PONTO_INTERVAL_TIME_TO_ANALYSE",
-                    Collections.emptyMap()
+                    Collections.emptyMap(),
+                    ServiceUser.class.getSimpleName()
             );
             var id = UUID.randomUUID().toString();
             var type = User.class.getName();

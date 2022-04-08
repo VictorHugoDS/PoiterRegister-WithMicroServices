@@ -1,5 +1,10 @@
 package br.com.ponto;
 
+import br.com.ponto.consumer.KafkaServiceExecute;
+import br.com.ponto.databaseThings.DatabaseRequest;
+import br.com.ponto.databaseThings.TypesOfRequest;
+import br.com.ponto.messageThings.Message;
+import br.com.ponto.producer.KafkaDispatcher;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 
 import java.util.*;
@@ -24,7 +29,7 @@ public class ConnectRegisterToValidator {
                 TypesOfRequest.SELECT_ALL,
                 "PONTO_ALL_POINTS_OF_USER",
                 point);
-        var kafkaDispatcher = new KafkaDispatcher<DatabaseRequest<Point>>("PONTO_POINT_DATABASE_REQUEST",Map.of());
+        var kafkaDispatcher = new KafkaDispatcher<DatabaseRequest<Point>>("PONTO_POINT_DATABASE_REQUEST",Map.of(),ConnectRegisterToValidator.class.getSimpleName());
         kafkaDispatcher.send(
                 point.getUser().getCpf(),
                 UUID.randomUUID().toString(),

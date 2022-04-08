@@ -30,6 +30,7 @@
         <module>Service-Connect-Register-Validator</module>
         <module>Service-Connect-Authentication-to-Register</module>
         <module>Service-Status-Validate</module>
+        <module>Service-Http-Ponto-Server</module>
     </modules>
 
     <properties>

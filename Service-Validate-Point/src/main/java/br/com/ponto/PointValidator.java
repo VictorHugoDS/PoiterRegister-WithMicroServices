@@ -1,5 +1,11 @@
 package br.com.ponto;
 
+import br.com.ponto.consumer.GsonAdvancedDeserializer;
+import br.com.ponto.consumer.KafkaServiceExecute;
+import br.com.ponto.databaseThings.DatabaseRequest;
+import br.com.ponto.databaseThings.TypesOfRequest;
+import br.com.ponto.messageThings.Message;
+import br.com.ponto.producer.KafkaDispatcher;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 
@@ -12,7 +18,7 @@ public class PointValidator {
     public static void main(String[] args) {
         var pointValidator = new PointValidator();
         Map<String,String> map = new HashMap<>();
-        map.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG,GsonAdvancedDeserializer.class.getName());
+        map.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, GsonAdvancedDeserializer.class.getName());
         map.put(GsonAdvancedDeserializer.ADVANCED_SERIALIZER_UPPER_CLASS,ArrayList.class.getName());
         map.put(GsonAdvancedDeserializer.ADVANCED_SERIALIZER_SUB_CLASS, Point.class.getName());
         var kafkaService = new KafkaServiceExecute<>(
@@ -37,7 +43,7 @@ public class PointValidator {
                     "PONTO_POINT_VALIDATION_COMPLETE",
                     point,
                     "valid");
-            var kafkaDispatcher = new KafkaDispatcher<DatabaseRequest<Point>>("PONTO_POINT_DATABASE_REQUEST",Map.of());
+            var kafkaDispatcher = new KafkaDispatcher<DatabaseRequest<Point>>("PONTO_POINT_DATABASE_REQUEST",Map.of(),PointValidator.class.getSimpleName());
             kafkaDispatcher.send(
                     point.getUser().getCpf(),
                     UUID.randomUUID().toString(),
@@ -59,6 +65,7 @@ public class PointValidator {
                 count += 1;
             }
         }
+
         for (var point : pointsToValidate) {
             if(!point.getDatePoint().getTime().equals(maxDate)){
                 point.setValidation(Validation.INVALID);
@@ -70,7 +77,6 @@ public class PointValidator {
                 }
             }
         }
-
         return pointsToValidate;
     }
 }
