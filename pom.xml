@@ -31,6 +31,8 @@
         <module>Service-Connect-Authentication-to-Register</module>
         <module>Service-Status-Validate</module>
         <module>Service-Http-Ponto-Server</module>
+        <module>Service-Connect-DataBase-Report</module>
+        <module>Service-Write-Report</module>
     </modules>
 
     <properties>

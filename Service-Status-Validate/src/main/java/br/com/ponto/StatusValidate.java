@@ -35,7 +35,7 @@ public class StatusValidate {
     private Point determineIfLateOrEarly(String hour, Point point) throws ParseException {
         Calendar cal = Calendar.getInstance();
         String date = new java.sql.Date(cal.getTime().getTime()).toString();
-        SimpleDateFormat sdf = new SimpleDateFormat("YYYY-MM-DD HH:mm:ss");
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         String dateHour = date +" "+ hour;
         Date data = sdf.parse(dateHour);
 

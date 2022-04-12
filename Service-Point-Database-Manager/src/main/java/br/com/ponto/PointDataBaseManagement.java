@@ -23,7 +23,7 @@ public class PointDataBaseManagement {
 
     PointDataBaseManagement() {
 
-        String url = "jdbc:sqlite:users_database.db";
+        String url = "jdbc:sqlite:pointDatabase.db";
         try {
             Class.forName("org.sqlite.JDBC");
         } catch (ClassNotFoundException e) {
@@ -89,6 +89,9 @@ public class PointDataBaseManagement {
     }
 
     private void selectAllBasedOnPoint(Point point,String topic) throws SQLException, ParseException, ExecutionException, InterruptedException {
+        System.out.println("=================================");
+        System.out.println(point.toString());
+        System.out.println("=================================");
         var newPoint = getAllPointsRegisteredTodayOfAUser(point.getDatePoint(),point.getUser());
         if(topic != null){
             var dispatcher = new KafkaDispatcher<ArrayList<Point>>(topic,Map.of(),PointDataBaseManagement.class.getSimpleName());
@@ -127,7 +130,6 @@ public class PointDataBaseManagement {
                 "SELECT * FROM  point_register WHERE cpf = ? ORDER BY register DESC LIMIT 1");
         statement.setString(1,user.getCpf());
         var result = statement.executeQuery();
-        SimpleDateFormat sdf = new SimpleDateFormat("YYYY-MM-DD HH:mm:ss");
 
         if(result.next()){
             return getPoint(result);
@@ -136,7 +138,7 @@ public class PointDataBaseManagement {
     }
 
     private Point getPoint(ResultSet results) throws SQLException, ParseException {
-        SimpleDateFormat sdf = new SimpleDateFormat("YYYY-MM-DD HH:mm:ss");
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
         var id = results.getString("id");
         var userId = results.getString("userId");
@@ -184,13 +186,17 @@ public class PointDataBaseManagement {
     }
 
 
-    private String[] getHourInterval(Calendar dataToSearch){
-        String date = new Date(dataToSearch.getTime().getTime()).toString();
+    private String[] getHourInterval(Calendar dateToSearch){
+        String date = new Date(dateToSearch.getTime().getTime()).toString();
         return new String[]{date + " 00:00:00", date + " 23:59:59"};
     }
 
     private ArrayList<Point> getAllPointsRegisteredTodayOfAUser(Calendar dataToSearch, User user) throws SQLException, ParseException {
-        String[] interval = getHourInterval(dataToSearch);
+        Calendar call = dataToSearch;
+        if(call == null){
+            call = Calendar.getInstance();
+        }
+        String[] interval = getHourInterval(call);
 
         var statement = connection.prepareStatement("Select * from "+tableName+" where  cpf = ?" +
                 " and (register BETWEEN ? AND ?)");

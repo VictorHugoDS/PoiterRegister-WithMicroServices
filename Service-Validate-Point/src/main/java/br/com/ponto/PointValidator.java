@@ -15,6 +15,9 @@ import java.util.stream.Collectors;
 
 public class PointValidator {
 
+    private boolean generateReport = false;
+    private User user;
+
     public static void main(String[] args) {
         var pointValidator = new PointValidator();
         Map<String,String> map = new HashMap<>();
@@ -51,10 +54,13 @@ public class PointValidator {
                     request
             );
         }
+        if(generateReport){
+            sendToGenerateReport(user);
+        }
 
     }
 
-    private List<Point> getPointsValidated(ArrayList<Point> pointList) {
+    private List<Point> getPointsValidated(ArrayList<Point> pointList)  {
         int count = 0;
 
         var pointsToValidate = pointList.stream().filter(p->p.getValidation()==Validation.PENDING)
@@ -72,11 +78,26 @@ public class PointValidator {
             } else {
                 if(count <= 3){
                     point.setValidation(Validation.VALID);
+                    if(count==3){
+                        generateReport = true;
+                        user = point.getUser();
+                    }
                 } else {
                     point.setValidation(Validation.INVALID);
                 }
             }
         }
         return pointsToValidate;
+    }
+
+    private void sendToGenerateReport(User user) throws ExecutionException, InterruptedException {
+        System.out.println("Ready for report");
+        var kafkaDispatcher = new KafkaDispatcher<User>("PONTO_USER_READY_FOR_REPORT",Map.of(),User.class.getSimpleName());
+        kafkaDispatcher.send(
+                user.getCpf(),
+                UUID.randomUUID().toString(),
+                user.getClass().getName(),
+                user
+        );
     }
 }

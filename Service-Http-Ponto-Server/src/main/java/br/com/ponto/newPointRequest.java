@@ -5,6 +5,7 @@ import br.com.ponto.producer.KafkaDispatcher;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.Collections;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
@@ -18,7 +19,7 @@ public class newPointRequest extends HttpServlet {
     );
 
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp)  {
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         var name = req.getParameter("name");
         var cpf = req.getParameter("cpf");
 
@@ -30,6 +31,8 @@ public class newPointRequest extends HttpServlet {
         } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
         }
+        resp.getWriter().println("A new point was registered! XD");
+        resp.setStatus(HttpServletResponse.SC_OK);
     }
 
     @Override
