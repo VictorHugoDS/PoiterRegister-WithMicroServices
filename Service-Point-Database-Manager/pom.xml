@@ -9,7 +9,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>Service-Database-Mananger</artifactId>
+    <artifactId>Service-Point-Database-Manager</artifactId>
     <dependencies>
         <dependency>
             <groupId>org.example</groupId>

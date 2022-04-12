@@ -9,7 +9,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>Service-Request-Interval-Analyser</artifactId>
+    <artifactId>Service-Connect-Authentication-to-Register</artifactId>
     <dependencies>
         <dependency>
             <groupId>org.example</groupId>

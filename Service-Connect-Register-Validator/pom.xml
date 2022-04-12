@@ -9,7 +9,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>Service-Connect-</artifactId>
+    <artifactId>Service-Connect-Register-Validator</artifactId>
     <dependencies>
         <dependency>
             <groupId>org.example</groupId>

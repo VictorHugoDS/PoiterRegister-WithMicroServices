@@ -9,7 +9,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>Service-User-Autentication</artifactId>
+    <artifactId>Service-User-Authentication</artifactId>
     <dependencies>
         <dependency>
             <groupId>org.example</groupId>

@@ -44,7 +44,7 @@ public class PointRegister {
         }
         long difference = minutesDifference(cal,Calendar.getInstance());
         //return difference > 15;
-        //TO DO: em função do sistema ainda estar sendo construido está sempre retornando true
+        //This function has been simplified to always return true for testing purposes
         return true;
     }
 
