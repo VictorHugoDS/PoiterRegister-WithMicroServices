@@ -25,6 +25,8 @@ The structure of the project is simplified in the image below:
 
 - When 4 points are register, the system will generate a report in JSON format in a directory named as the name of the user, a and the file named as the date of the registers.
 
+- After 4 poits, all registers will be invalid, because a user only can make 4 registers at a day;
+
 
 ### How to run the project ?
 
