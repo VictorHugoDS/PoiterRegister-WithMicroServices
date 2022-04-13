@@ -37,15 +37,6 @@ The structure of the project is simplified in the image below:
 After that, you will just need to run all the microservices. And that, register a point at `localHost8080/register-point/new?name=&cpf=`
 
 
-### How to run the project ?
-
-- You will need java 11 or a superior version;
-
-- You need to run the (apache kafka link) in the port 127.0.0.1:9092;
-
-After that, you will just need to run the microservices.
-
-
 ### Some considerations
 
 - The system was for training my skills in microservice development, so the system doesn’t have a user database, all the users are in a fixer [json file](https://github.com/VictorHugoDS/PoiterRegister-WithMicroServices/blob/main/Service-User-Authentication/src/main/resources/users.txt).
