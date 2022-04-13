@@ -43,7 +43,7 @@ After that, you will just need to run all the microservices. And that, register 
 
 - The Report is generated at `src/main/java/resources`;
 
-- It was very cool to develop it, I had some database problems and had to learn some things about serialization e deserialization to make it work all it works. But knowledge it’s power, isn't it?
+- It was very cool to develop it, I had some database problems and had to learn some things about serialization e deserialization to make it works. But knowledge it’s power, isn't it?
 
 #### What was used:
 
